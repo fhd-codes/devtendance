@@ -1,4 +1,5 @@
 const dotenv = require('dotenv');
+const { verifyKey } = require('discord-interactions');
 
 dotenv.config();
 
@@ -34,6 +35,20 @@ async function DiscordRequest( endpoint, options ){
 }
 
 
+function VerifyDiscordRequest( client_key ){
+    return function( req, res, buf, encoding ){
+        const signature = req.get('X-Signature-Ed25519');
+        const timestamp = req.get('X-Signature-Timestamp');
+    
+        const isValidRequest = verifyKey(buf, signature, timestamp, client_key);
+        if( !isValidRequest ){
+            res.status(401).send('Bad request signature');
+            throw new Error('Bad request signature');
+        }
+    };
+}
+
+
 async function InstallGlobalCommands( app_id, commands){
     /**
      * This function is used to register slash commands for the discord bot
@@ -58,5 +73,6 @@ async function InstallGlobalCommands( app_id, commands){
 
 module.exports = {
     DiscordRequest,
+    VerifyDiscordRequest,
     InstallGlobalCommands
 };

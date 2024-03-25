@@ -1,6 +1,5 @@
 const dotenv = require('dotenv');
 
-
 const { InstallGlobalCommands } = require('./utils.js');
 
 
