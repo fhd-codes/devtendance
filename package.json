@@ -1,0 +1,28 @@
+{
+  "name": "devtendance",
+  "version": "1.0.0",
+  "description": "A discord bot for tracking check-in and check-out times",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/index.js",
+    "dev": "nodemon ./src/index.js",
+    "register": "node ./src/commands.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fhd-codes/devtendance.git"
+  },
+  "author": "fhd-codes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fhd-codes/devtendance/issues"
+  },
+  "homepage": "https://github.com/fhd-codes/devtendance#readme",
+  "dependencies": {
+    "discord-interactions": "^3.4.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.1",
+    "node-fetch": "^3.3.2"
+  }
+}
