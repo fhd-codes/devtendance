@@ -7,6 +7,9 @@ const {
 
 const { VerifyDiscordRequest, DiscordRequest } = require('./utils.js');
 
+const { handleCheckin } = require('./commands_controller/checkin.js');
+const { handleCheckout } = require('./commands_controller/checkout.js');
+
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,29 +21,31 @@ app.use(
 
 app.post('/interactions', async function ( req, res ){ // Interactions endpoint URL where Discord will send HTTP requests
     // Interaction type and data
-    const { type, id, data } = req.body;
+    const { type, data } = req.body;
 
-    // Handle verification requests
+    // ----------------------------------------------------------------------
+    // Acknowledging PING requests from Discord
     if (type === InteractionType.PING) {
         return res.send({ type: InteractionResponseType.PONG });
     }
+    
+    // ----------------------------------------------------------------------
+    // Handeling slash commands 
 
-    /**
-     * Handle slash command requests
-     * See https://discord.com/developers/docs/interactions/application-commands#slash-commands
-    */
     if (type === InteractionType.APPLICATION_COMMAND) {
         const { name } = data;
 
-        if( name === 'test' ){ // "test" command
-            // Send a message into the channel where command was triggered from
-            return res.send({
-                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                data: {
-                    content: 'hello world',
-                },
-            });
+        if( name === 'checkin' ){ // for checkin command
+            return handleCheckin( req, res );
         }
+        
+        else if( name === 'checkout' ){ // for checkout command
+            return handleCheckout( req, res );
+        }
+
+
+
+
     }
 });
 
