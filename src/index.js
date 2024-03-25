@@ -5,7 +5,7 @@ const {
     InteractionResponseType,
 } = require ('discord-interactions');
 
-const { VerifyDiscordRequest, DiscordRequest } = require('./utils.js');
+const { VerifyDiscordRequest } = require('./utils.js');
 
 const { handleCheckin } = require('./commands_controller/checkin.js');
 const { handleCheckout } = require('./commands_controller/checkout.js');
@@ -19,7 +19,7 @@ app.use(
     express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) })
 );
 
-app.post('/interactions', async function ( req, res ){ // Interactions endpoint URL where Discord will send HTTP requests
+app.post('/interactions', async ( req, res ) => { // Interactions endpoint URL where Discord will send HTTP requests
     // Interaction type and data
     const { type, data } = req.body;
 
