@@ -27,7 +27,6 @@ async function DiscordRequest( endpoint, options ){
 
     if( !res.ok ){ // throw API errors
         const data = await res.json();
-        console.log(res.status);
         throw new Error( JSON.stringify(data) );
     }
     // return original response

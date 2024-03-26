@@ -5,7 +5,7 @@ const {
     InteractionResponseType,
 } = require ('discord-interactions');
 
-const { VerifyDiscordRequest } = require('./utils.js');
+const { VerifyDiscordRequest } = require('./aux/utils.js');
 
 const { handleCheckin } = require('./commands_controller/checkin.js');
 const { handleCheckout } = require('./commands_controller/checkout.js');
