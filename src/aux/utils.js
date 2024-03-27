@@ -48,7 +48,7 @@ function VerifyDiscordRequest( client_key ){
 }
 
 
-async function InstallGlobalCommands( app_id, commands){
+async function InstallGlobalCommands( BOT_APP_ID, commands){
     /**
      * This function is used to register slash commands for the discord bot
      * All the commands are configured in ./src/commands.js file
@@ -57,7 +57,7 @@ async function InstallGlobalCommands( app_id, commands){
      * such as slash commands, user commands, and message commands.
     */
 
-    const endpoint = `applications/${app_id}/commands`; // API endpoint to overwrite global commands
+    const endpoint = `applications/${BOT_APP_ID}/commands`; // API endpoint to overwrite global commands
   
     try{
         // This is calling the bulk overwrite endpoint: https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands

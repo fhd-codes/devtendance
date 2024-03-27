@@ -16,10 +16,10 @@ const PORT = process.env.PORT || 3000;
 
 // Parse request body and verifies incoming requests using discord-interactions package
 app.use(
-    express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) })
+    express.json({ verify: VerifyDiscordRequest(process.env.BOT_PUBLIC_KEY) })
 );
 
-app.post('/interactions', async ( req, res ) => { // Interactions endpoint URL where Discord will send HTTP requests
+app.post('/interactions', ( req, res ) => { // Interactions endpoint URL where Discord will send HTTP requests
     // Interaction type and data
     const { type, data } = req.body;
 
