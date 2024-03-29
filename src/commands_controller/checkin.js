@@ -3,7 +3,7 @@ const { InteractionResponseType } = require ('discord-interactions');
 const { 
     isMemberExist,
     createNewMember,
-    punchCheckInTime,
+    punchTime,
 } = require('../aux/airtable_helper.js');
 
 
@@ -26,20 +26,22 @@ const handleCheckin = async (req, res) => {
             ).then( (new_record) => {
                 checkin_bot_reply = "Welcome to Devnetix. " + checkin_bot_reply;
 
-                // punching in the checkin time and updating availability status
-                punchCheckInTime( new_record.id, wfh );
-                console.log("new record is made");
+                // punching in the checkin time and updating availability status for new user
+                punchTime( new_record.id, user.id, "in", wfh ); // args: (airtable_record_id, discord_user_id, check in or out, wfh status)
             });
         } else{
-            // punching in the checkin time and updating availability status
-            punchCheckInTime( res.record.id, wfh );
+            const current_status = res.record.fields.status;
 
+            if( current_status === "available" || current_status === "available_wfh" ){
+                checkin_bot_reply = "You are already signed in. Signing in again will not increase your salary";
+            } else{
+                // punching in the checkin time and updating availability status for existing user
+                punchTime( res.record.id, user.id, "in", wfh ); // args: (airtable_record_id, discord_user_id, check in or out, wfh status)
+            }
         }
 
         
-        
     }).then(() => {
-        console.log("done here");
 
         return res.send({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,

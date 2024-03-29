@@ -1,4 +1,8 @@
+const UIDGenerator = require('uid-generator');
+
 const { airtable_base } = require('./airtable_connection');
+
+const uidgen = new UIDGenerator();
 
 /**
     This file will have all the helper functions that will be used to get, or update
@@ -32,22 +36,34 @@ const createNewMember = async ( discord_user_id, discord_username, discord_full_
 }
 
 
-const punchCheckInTime = ( airtable_record_id, wfh ) => {
+const punchTime = ( airtable_record_id, discord_user_id, in_or_out, wfh=null ) => {
     
     // updating the availability status in the "members" table
     airtable_base('members').update([
         {
             "id": airtable_record_id,
             "fields": {
-                "status": wfh ? "wfh" : "available"
+                "status": in_or_out === "out" ? "offline" : wfh ? "available_wfh" : "available"
             }
         }
     ]);
+
+    airtable_base('attendance_ledger').create(
+        [
+            {
+                "fields": {
+                    "uid": uidgen.generateSync(), // this is uid for checkin checkout
+                    "discord_user_id": discord_user_id,
+                    "type": in_or_out === "in" ? (wfh ? "checkin_wfh" : "checkin") : "checkout"
+                }
+            },
+        ]
+    )
 
 }
 
 module.exports = {
     isMemberExist,
     createNewMember,
-    punchCheckInTime
+    punchTime
 }
