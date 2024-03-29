@@ -1,6 +1,10 @@
 
 
-function addHoursToCurrentTime(hours) {
+const addHoursToCurrentTime = ( hours ) => {
+    /**
+        @params = { int } - number of hours
+        @returns = { string } - time in format hh:mm (AM/PM)
+    */
     const date = new Date();
 
     const hoursToAdd = hours * 60 * 60 * 1000;

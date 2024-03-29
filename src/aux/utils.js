@@ -6,8 +6,11 @@ dotenv.config();
 
 async function DiscordRequest( endpoint, options ){
     /**
-     * This function takes an endpoint and request body options as input arguments
-     * and then sends request to the discord REST api endpoints
+        This function takes an endpoint and request body options as input arguments
+        and then sends request to the discord REST api endpoints
+
+        @params = { string, object } - endpoint to hit and the req body options object
+        @returns = { object } - response object from that endpoint
     */
     
     const url = 'https://discord.com/api/v10/' + endpoint; // making endpoint url
@@ -35,6 +38,13 @@ async function DiscordRequest( endpoint, options ){
 
 
 function VerifyDiscordRequest( client_key ){
+    /**
+        This function takes discord client secret key and verify the request
+
+        @params = { string } - discord client secret key
+        @returns = { object || null } - error response object if validation fails else null
+    */
+
     return function( req, res, buf, encoding ){
         const signature = req.get('X-Signature-Ed25519');
         const timestamp = req.get('X-Signature-Timestamp');
@@ -50,11 +60,14 @@ function VerifyDiscordRequest( client_key ){
 
 async function InstallGlobalCommands( BOT_APP_ID, commands){
     /**
-     * This function is used to register slash commands for the discord bot
-     * All the commands are configured in ./src/commands.js file
-     * In order to register the commands, write ```npm run register``` command in the terminal
-     * NOTE: This will overwrite all types of application commands
-     * such as slash commands, user commands, and message commands.
+        This function is used to register slash commands for the discord bot
+        All the commands are configured in ./src/commands.js file
+        In order to register the commands, write ```npm run register``` command in the terminal
+        NOTE: This will overwrite all types of application commands
+        such as slash commands, user commands, and message commands.
+
+        @params = { string, array } - discord bot id, and an array of commands object
+        @returns = { null }
     */
 
     const endpoint = `applications/${BOT_APP_ID}/commands`; // API endpoint to overwrite global commands
