@@ -17,7 +17,7 @@ const isMemberExist = async ( discord_user_id ) => {
         and airtable record object if user exists else null
     */
 
-    const records = await airtable_base( process.env.MEMBERS_TABLE_ID ).select({
+    const records = await airtable_base('members').select({
         filterByFormula: `{ID} = '${discord_user_id}'`,
     }).firstPage();
 
