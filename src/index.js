@@ -9,6 +9,8 @@ const { VerifyDiscordRequest } = require('./aux/utils.js');
 
 const { handleCheckin } = require('./commands_controller/checkin.js');
 const { handleCheckout } = require('./commands_controller/checkout.js');
+const { handleBrb } = require('./commands_controller/brb.js');
+const { handleBack } = require('./commands_controller/back.js');
 
 dotenv.config();
 const app = express();
@@ -35,13 +37,23 @@ app.post('/interactions', ( req, res ) => { // Interactions endpoint URL where D
     if (type === InteractionType.APPLICATION_COMMAND) {
         const { name } = data;
 
-        if( name === 'checkin' ){ // for checkin command
-            return handleCheckin( req, res );
-        }
-        
-        else if( name === 'checkout' ){ // for checkout command
-            return handleCheckout( req, res );
-        }
+        switch (name) {
+            case 'checkin':
+                return handleCheckin(req, res);
+            
+            case 'checkout':
+                return handleCheckout(req, res);
+            
+            case 'brb':
+                return handleBrb(req, res);
+            
+            case 'back':
+                return handleBack(req, res);
+            
+            default:
+              // Handle other cases or provide a default behavior
+          }
+          
 
 
 

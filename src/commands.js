@@ -57,6 +57,18 @@ const back_command = {
   name: 'back',
   description: 'To tell the team you came back',
   type: 1,  // command type: CHAT_INPUT (slash command)
+  "options": [
+    {
+      "name": "wfh",
+      "description": "Are you working from home?",
+      "type": 5, // boolean
+      "required": true,
+      "choices": [
+        { name: "No", value: false },
+        { name: "Yes", value: true }
+      ]
+    }
+  ]
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

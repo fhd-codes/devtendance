@@ -13,7 +13,7 @@ const handleCheckin = async (req, res) => {
     // if the member doing work from home or not: boolean
     const wfh = data.options[0].value;
 
-    let checkin_bot_reply = `Wish you a productive day, ${user.global_name}!`;
+    let bot_reply = `Wish you a productive day, ${user.global_name}!`;
 
     // checking if this user already exists in the Airtable or not
     isMemberExist( user.id ).then( (res) => {
@@ -24,7 +24,7 @@ const handleCheckin = async (req, res) => {
                 user.username, 
                 user.global_name
             ).then( (new_record) => {
-                checkin_bot_reply = "Welcome to Devnetix. " + checkin_bot_reply;
+                bot_reply = "Welcome to Devnetix. " + bot_reply;
 
                 // punching in the checkin time and updating availability status for new user
                 punchTime( new_record.id, user.id, "in", wfh ); // args: (airtable_record_id, discord_user_id, check in or out, wfh status)
@@ -33,7 +33,10 @@ const handleCheckin = async (req, res) => {
             const current_status = res.record.fields.status;
 
             if( current_status === "available" || current_status === "available_wfh" ){
-                checkin_bot_reply = "You are already signed in. Signing in again will not increase your salary";
+                bot_reply = "You are already signed in. Signing in again will not increase your salary";
+            } else if(current_status === "brb" ){
+                bot_reply = `Your current status is "brb", use '/back' command instead`;
+
             } else{
                 // punching in the checkin time and updating availability status for existing user
                 punchTime( res.record.id, user.id, "in", wfh ); // args: (airtable_record_id, discord_user_id, check in or out, wfh status)
@@ -46,7 +49,7 @@ const handleCheckin = async (req, res) => {
         return res.send({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
             data: {
-                content: checkin_bot_reply,
+                content: bot_reply,
             },
         });
     })
