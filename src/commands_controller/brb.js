@@ -30,7 +30,7 @@ const handleBrb = async (req, res) => {
         }
 
         
-    }).then(() => {
+    }).finally(() => {
 
         return res.send({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,

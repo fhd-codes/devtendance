@@ -46,7 +46,7 @@ const createNewMember = async ( discord_user_id, discord_username, discord_full_
 }
 
 
-const punchTime = ( airtable_record_id, discord_user_id, punch_type, wfh=false, notes=null ) => {
+const punchTime = async ( airtable_record_id, discord_user_id, punch_type, wfh=false, notes=null ) => {
     /**
         @params = { string, string, string, bool=false, string=null } - punch_type will be one of these: 
         ["in", "out", "brb", "back"]. Notes will be any string
