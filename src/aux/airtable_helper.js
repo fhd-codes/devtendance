@@ -79,7 +79,7 @@ const punchTime = ( airtable_record_id, discord_user_id, punch_type, wfh=false, 
                 "id": airtable_record_id,
                 "fields": {
                     "status": user_status,
-                    "notes": notes
+                    "notes": punch_type === "out" ? "" : notes
                 }
             }
         ]); 
@@ -90,7 +90,8 @@ const punchTime = ( airtable_record_id, discord_user_id, punch_type, wfh=false, 
                 "fields": {
                     "uid": uidgen.generateSync(), // this is uid for checkin checkout
                     "discord_user_id": discord_user_id,
-                    "type": attendance_type
+                    "type": attendance_type,
+                    "progress_report": punch_type === "out" ? notes : ""
                 }
             },
         ]);

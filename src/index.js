@@ -7,10 +7,11 @@ const {
 
 const { VerifyDiscordRequest } = require('./aux/utils.js');
 
-const { handleCheckin } = require('./commands_controller/checkin.js');
-const { handleCheckout } = require('./commands_controller/checkout.js');
-const { handleBrb } = require('./commands_controller/brb.js');
-const { handleBack } = require('./commands_controller/back.js');
+const { handleCheckin } = require('./command_controllers/checkin.js');
+const { handleCheckout } = require('./command_controllers/checkout.js');
+const { handleBrb } = require('./command_controllers/brb.js');
+const { handleBack } = require('./command_controllers/back.js');
+const { handleProgressSubmission } = require('./modal_controllers/progress_report_modal.js');
 
 dotenv.config();
 const app = express();
@@ -32,7 +33,7 @@ app.post('/interactions', async ( req, res ) => { // Interactions endpoint URL w
     }
     
     // ----------------------------------------------------------------------
-    // Handeling slash commands 
+    // Handeling slash commands
 
     if( type === InteractionType.APPLICATION_COMMAND ){
         const { name } = data;
@@ -53,9 +54,21 @@ app.post('/interactions', async ( req, res ) => { // Interactions endpoint URL w
             return await handleBack(req, res);
         }
 
+    } 
+    
+    // Handeling modal submissions
+    else if( type === InteractionType.MODAL_SUBMIT ){
+        const { custom_id } = data;
 
+        if( custom_id === 'progress_report_modal' ){
+            return await handleProgressSubmission(req, res);
+
+        }
     }
+    
 });
+
+
 
 app.get('/fhd', async (req, res) => {
     return res.send({ message: "Roti kha lo" });
