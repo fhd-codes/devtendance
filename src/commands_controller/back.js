@@ -11,13 +11,13 @@ const handleBack = async (req, res) => {
 
     let bot_reply = `Did you bring your creativity?!`;
 
-    // checking if this user already exists in the Airtable or not
-    isMemberExist( user.id ).then( (res) => {
-        if( !res.is_exist ){
+    try{
+        const member_exists = await isMemberExist( user.id );
+        if( !member_exists.is_exist ){
             bot_reply = "You are a new member! Checkin first and get yourself registered.";
 
         } else{
-            const current_status = res.record.fields.status;
+            const current_status = member_exists.record.fields.status;
             
             if( current_status === "back" || current_status === "offline" || current_status === "available" || current_status === "available_wfh"){
                 bot_reply = `Your current status is already ${current_status}`;
@@ -27,7 +27,7 @@ const handleBack = async (req, res) => {
                 
                 // punching in brb and updating availability status for existing user
                 punchTime( 
-                    res.record.id, // airtable_record_id
+                    member_exists.record.id, // airtable_record_id
                     user.id, // discord_user_id
                     "back", // punch_type
                     wfh, // wfh
@@ -35,19 +35,22 @@ const handleBack = async (req, res) => {
                 );
                 
             }
+
+            return res.send({
+                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                data: {
+                    content: bot_reply,
+                },
+            });
+            
         }
+    } catch( error ){
+        console.error("Error handling check-in:", error);
+        return res.status(500).send("Error handling check-in. Please try again later.");
+    }
 
-        
-    }).finally(() => {
+   
 
-        return res.send({
-            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            data: {
-                content: bot_reply,
-            },
-        });
-    })
-       
 }
 
 

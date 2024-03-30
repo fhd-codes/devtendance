@@ -21,7 +21,7 @@ app.use(
     express.json({ verify: VerifyDiscordRequest(process.env.BOT_PUBLIC_KEY) })
 );
 
-app.post('/interactions', ( req, res ) => { // Interactions endpoint URL where Discord will send HTTP requests
+app.post('/interactions', async ( req, res ) => { // Interactions endpoint URL where Discord will send HTTP requests
     // Interaction type and data
     const { type, data } = req.body;
 
@@ -37,25 +37,21 @@ app.post('/interactions', ( req, res ) => { // Interactions endpoint URL where D
     if (type === InteractionType.APPLICATION_COMMAND) {
         const { name } = data;
 
-        switch (name) {
-            case 'checkin':
-                return handleCheckin(req, res);
-            
-            case 'checkout':
-                return handleCheckout(req, res);
-            
-            case 'brb':
-                return handleBrb(req, res);
-            
-            case 'back':
-                return handleBack(req, res);
-            
-            default:
-              // Handle other cases or provide a default behavior
-          }
-          
-
-
+        if( name === 'checkin'){
+            return await handleCheckin(req, res);
+        }
+        
+        else if( name === 'checkout'){
+            return await handleCheckout(req, res);
+        }
+        
+        else if( name === 'brb'){
+            return await handleBrb(req, res);
+        }
+        
+        else if( name === 'back'){
+            return await handleBack(req, res);
+        }
 
 
     }

@@ -46,12 +46,17 @@ const createNewMember = async ( discord_user_id, discord_username, discord_full_
 }
 
 
-const punchTime = async ( airtable_record_id, discord_user_id, punch_type, wfh=false, notes=null ) => {
+const punchTime = ( airtable_record_id, discord_user_id, punch_type, wfh=false, notes=null ) => {
     /**
         @params = { string, string, string, bool=false, string=null } - punch_type will be one of these: 
         ["in", "out", "brb", "back"]. Notes will be any string
         @returns = { null }
     */
+
+    // NOTE: making thisw function async is causing error
+    // the airtable gets updated, but the bot reply did not come in response to discord
+    // that's why the async await is not added here
+
     let user_status = null;
 
     if( punch_type === "in" || punch_type === "back" ){
@@ -67,19 +72,20 @@ const punchTime = async ( airtable_record_id, discord_user_id, punch_type, wfh=f
     let attendance_type = user_status.replace("available", "checkin");
     attendance_type = attendance_type.replace("offline", "checkout");
 
-    // updating the availability status in the "members" table
-    airtable_base('members').update([
-        {
-            "id": airtable_record_id,
-            "fields": {
-                "status": user_status,
-                "notes": notes
+    try{
+        // updating the availability status in the "members" table
+        airtable_base('members').update([
+            {
+                "id": airtable_record_id,
+                "fields": {
+                    "status": user_status,
+                    "notes": notes
+                }
             }
-        }
-    ]);
+        ]); 
 
-    airtable_base('attendance_ledger').create(
-        [
+
+        airtable_base('attendance_ledger').create([
             {
                 "fields": {
                     "uid": uidgen.generateSync(), // this is uid for checkin checkout
@@ -87,8 +93,14 @@ const punchTime = async ( airtable_record_id, discord_user_id, punch_type, wfh=f
                     "type": attendance_type
                 }
             },
-        ]
-    )
+        ]);
+
+
+    } catch( error ){
+        console.error("Error handling updating ledger:", error);
+        return res.status(500).send("Error handling ledger. Please try again later.");
+    }
+
 
 }
 

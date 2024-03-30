@@ -16,35 +16,29 @@ const handleCheckin = async (req, res) => {
     let bot_reply = `Wish you a productive day, ${user.global_name}!`;
 
     // checking if this user already exists in the Airtable or not
-    isMemberExist( user.id ).then( (res) => {
-        if( !res.is_exist ){
-            // if not, then creating the entry in Airtable and punching
-            createNewMember( 
-                user.id, 
-                user.username, 
-                user.global_name
-            ).then( (new_record) => {
-                bot_reply = "Welcome to Devnetix. " + bot_reply;
+    try {
+        const member_exists = await isMemberExist( user.id );
 
-                // punching in the checkin time and updating availability status for new user
-                punchTime( new_record.id, user.id, "in", wfh ); // args: (airtable_record_id, discord_user_id, check in or out, wfh status)
-            });
+        if( !member_exists.is_exist ){
+            const new_record = await createNewMember( user.id, user.username, user.global_name );
+            
+            bot_reply = "Welcome to Devnetix. " + bot_reply;
+            punchTime(new_record.id, user.id, "in", wfh);
+
         } else{
-            const current_status = res.record.fields.status;
+            const current_status = member_exists.record.fields.status;
 
             if( current_status === "available" || current_status === "available_wfh" ){
                 bot_reply = "You are already signed in. Signing in again will not increase your salary";
-            } else if(current_status === "brb" ){
+
+            } else if( current_status === "brb" ){
                 bot_reply = `Your current status is "brb", use '/back' command instead`;
 
             } else{
-                // punching in the checkin time and updating availability status for existing user
-                punchTime( res.record.id, user.id, "in", wfh ); // args: (airtable_record_id, discord_user_id, check in or out, wfh status)
+                punchTime( member_exists.record.id, user.id, "in", wfh );
+
             }
         }
-
-        
-    }).finally(() => {
 
         return res.send({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -52,7 +46,11 @@ const handleCheckin = async (req, res) => {
                 content: bot_reply,
             },
         });
-    })
+
+    } catch( error ){
+        console.error("Error handling check-in:", error);
+        return res.status(500).send("Error handling check-in. Please try again later.");
+    }
        
 }
 
