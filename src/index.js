@@ -34,7 +34,7 @@ app.post('/interactions', async ( req, res ) => { // Interactions endpoint URL w
     // ----------------------------------------------------------------------
     // Handeling slash commands 
 
-    if (type === InteractionType.APPLICATION_COMMAND) {
+    if( type === InteractionType.APPLICATION_COMMAND ){
         const { name } = data;
 
         if( name === 'checkin'){
