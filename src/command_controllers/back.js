@@ -1,13 +1,12 @@
-const { InteractionResponseType } = require ('discord-interactions');
-
 const { 
     isMemberExist,
     punchTime,
 } = require('../aux/airtable_helper.js');
+const { botSuccessReply } = require('../aux/bot_helper.js');
 
 
 const handleBack = async (req, res) => {
-    const { user, data } = req.body;
+    const { user, data, token } = req.body;
 
     let bot_reply = `Did you bring your creativity?!`;
 
@@ -26,7 +25,7 @@ const handleBack = async (req, res) => {
                 const wfh = data.options[0].value;
                 
                 // punching in brb and updating availability status for existing user
-                punchTime( 
+                const ledger_rec = await punchTime( 
                     member_exists.record.id, // airtable_record_id
                     user.id, // discord_user_id
                     "back", // punch_type
@@ -34,14 +33,10 @@ const handleBack = async (req, res) => {
                     "" // notes
                 );
                 
+                bot_reply = ledger_rec.length > 0 ? bot_reply : "Um.. can you try again, I could not update your punch time";
             }
 
-            return res.send({
-                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                data: {
-                    content: bot_reply,
-                },
-            });
+            botSuccessReply( token, bot_reply );
             
         }
     } catch( error ){

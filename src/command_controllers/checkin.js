@@ -1,14 +1,14 @@
-const { InteractionResponseType } = require ('discord-interactions');
-
 const { 
     isMemberExist,
     createNewMember,
     punchTime,
 } = require('../aux/airtable_helper.js');
 
+const { botSuccessReply } = require('../aux/bot_helper.js');
+
 
 const handleCheckin = async (req, res) => {
-    const { user, data } = req.body;
+    const { user, data, token } = req.body;
 
     // if the member doing work from home or not: boolean
     const wfh = data.options[0].value;
@@ -22,9 +22,10 @@ const handleCheckin = async (req, res) => {
         if( !member_exists.is_exist ){
             const new_record = await createNewMember( user.id, user.username, user.global_name );
             
-            bot_reply = "Welcome to Devnetix. " + bot_reply;
-            punchTime(new_record.id, user.id, "in", wfh);
-
+            if( new_record?.id ){
+                const ledger_rec = await punchTime(new_record.id, user.id, "in", wfh);
+                bot_reply = ledger_rec.length > 0 ? "Welcome to Devnetix. " + bot_reply : "Um.. can you try again, I could not update your punch time";
+            }
         } else{
             const current_status = member_exists.record.fields.status;
 
@@ -35,17 +36,12 @@ const handleCheckin = async (req, res) => {
                 bot_reply = `Your current status is "brb", use '/back' command instead`;
 
             } else{
-                punchTime( member_exists.record.id, user.id, "in", wfh );
-
+                const ledger_rec = await punchTime( member_exists.record.id, user.id, "in", wfh );
+                bot_reply = ledger_rec.length > 0 ? bot_reply : "Um.. can you try again, I could not update your punch time";
             }
         }
 
-        return res.send({
-            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            data: {
-                content: bot_reply,
-            },
-        });
+        botSuccessReply( token, bot_reply );
 
     } catch( error ){
         console.error("Error handling check-in:", error);

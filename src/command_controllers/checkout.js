@@ -1,5 +1,5 @@
-const { InteractionResponseType } = require ('discord-interactions');
-const { isMemberExist, punchTime } = require('../aux/airtable_helper');
+const { InteractionResponseType } = require('discord-interactions');
+const { isMemberExist } = require('../aux/airtable_helper');
 
 
 const handleCheckout = async (req, res) => {

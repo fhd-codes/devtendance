@@ -96,4 +96,4 @@ const all_commands = [
 ];
 
 
-InstallGlobalCommands( process.env.BOT_APP_ID, all_commands );
+InstallGlobalCommands( all_commands );

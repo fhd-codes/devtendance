@@ -5,13 +5,14 @@ const {
     InteractionResponseType,
 } = require ('discord-interactions');
 
-const { VerifyDiscordRequest } = require('./aux/utils.js');
+const { VerifyDiscordRequest } = require('./src/aux/utils.js');
 
-const { handleCheckin } = require('./command_controllers/checkin.js');
-const { handleCheckout } = require('./command_controllers/checkout.js');
-const { handleBrb } = require('./command_controllers/brb.js');
-const { handleBack } = require('./command_controllers/back.js');
-const { handleProgressSubmission } = require('./modal_controllers/progress_report_modal.js');
+const { handleCheckin } = require('./src/command_controllers/checkin.js');
+const { handleCheckout } = require('./src/command_controllers/checkout.js');
+const { handleBrb } = require('./src/command_controllers/brb.js');
+const { handleBack } = require('./src/command_controllers/back.js');
+const { handleProgressSubmission } = require('./src/modal_controllers/progress_report_modal.js');
+const { botIsWorking } = require('./src/aux/bot_helper.js');
 
 dotenv.config();
 const app = express();
@@ -36,22 +37,32 @@ app.post('/interactions', async ( req, res ) => { // Interactions endpoint URL w
     // Handeling slash commands
 
     if( type === InteractionType.APPLICATION_COMMAND ){
+        // NOTE: we are not awaiting for the handle commands functions because of the 3000ms 
+        // time limit of discord response. Check README.md file for details
+
         const { name } = data;
 
         if( name === 'checkin'){
-            return await handleCheckin(req, res);
+            handleCheckin( req, res );
+            return botIsWorking( res );
         }
         
         else if( name === 'checkout'){
-            return await handleCheckout(req, res);
+            // checkout commands sends a modal in response
+            return await handleCheckout( req, res );
+
         }
         
         else if( name === 'brb'){
-            return await handleBrb(req, res);
+            handleBrb( req, res );
+            return botIsWorking( res );
+
         }
         
         else if( name === 'back'){
-            return await handleBack(req, res);
+            handleBack( req, res );
+            return botIsWorking( res );
+
         }
 
     } 
