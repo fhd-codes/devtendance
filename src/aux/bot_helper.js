@@ -9,24 +9,17 @@ dotenv.config();
 
 const botIsWorking = ( res ) => {
     /**
-        This function will randomly select a message from the array and send it as a discord bot reply
+        This function will send a defer response saying that the bot is thinking in order to acknowledge the 
+        interaction within 3000ms
         Due to the 3000 ms limit of bot's response, we need to send this response first and then later
         send a follow-up message when all the async requests are completed.
         
         @params = { object } - response object from (req, res)
-        @returns = { object } - discord bot response
+        @returns = { object } - discord bot defer response
     */
 
-    const working_msg_list = [
-        "Working on your request!",
-        "Hold tight if you might"
-    ];
-
     return res.send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-            content: working_msg_list[Math.floor(Math.random() * working_msg_list.length)],
-        },
+        type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
     });
 }
 
