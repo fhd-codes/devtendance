@@ -98,8 +98,8 @@ const report_command = {
       "choices": [
         { name: "Last 7 days", value: "last_7_days" },
         { name: "Last 30 days", value: "last_30_days" },
-        { name: "Last month", value: "last_month" },
-        { name: "Last 2 month", value: "last_2_months" },
+        // { name: "Last month", value: "last_month" },
+        // { name: "Last 2 month", value: "last_2_months" }, TODO: work on these commands
       ]
     }
   ]
