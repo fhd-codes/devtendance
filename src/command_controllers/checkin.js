@@ -23,7 +23,7 @@ const handleCheckin = async (req, res) => {
             const new_record = await createNewMember( user.id, user.username, user.global_name );
             
             if( new_record?.id ){
-                const ledger_rec = await punchTime(new_record.id, user.id, "in", wfh);
+                const ledger_rec = await punchTime(new_record.id, user.id, user.global_name, "in", wfh);
                 bot_reply = ledger_rec.length > 0 ? "Welcome to Devnetix. " + bot_reply : "Um.. can you try again, I could not update your punch time";
             }
         } else{
@@ -36,7 +36,7 @@ const handleCheckin = async (req, res) => {
                 bot_reply = `Your current status is "brb", use '/back' command instead`;
 
             } else{
-                const ledger_rec = await punchTime( member_exists.record.id, user.id, "in", wfh );
+                const ledger_rec = await punchTime( member_exists.record.id, user.id, user.global_name, "in", wfh );
                 bot_reply = ledger_rec.length > 0 ? bot_reply : "Um.. can you try again, I could not update your punch time";
             }
         }

@@ -28,6 +28,7 @@ const handleBack = async (req, res) => {
                 const ledger_rec = await punchTime( 
                     member_exists.record.id, // airtable_record_id
                     user.id, // discord_user_id
+                    user.global_name,
                     "back", // punch_type
                     wfh, // wfh
                     "" // notes

@@ -23,7 +23,14 @@ const handleBrb = async (req, res) => {
                 bot_reply = `Your current status is already ${current_status}`;
             } else{
                 // punching in brb and updating availability status for existing user
-                const ledger_rec = await punchTime( airtable_record_id=member_exists.record.id, discord_user_id=user.id, punch_type="brb", wfh=false, notes=`I'll be back at around ${addHoursToCurrentTime(data.options[0].value)}` );
+                const ledger_rec = await punchTime( 
+                    member_exists.record.id, // airtable_record_id
+                    user.id, // discord_user_id
+                    user.global_name, // disocrd_full_name
+                    "brb", // punch_type
+                    false, // wfh
+                    `I'll be back at around ${addHoursToCurrentTime(data.options[0].value)}` // notes
+                );
                 bot_reply = ledger_rec.length > 0 ? bot_reply : "Um.. can you try again, I could not update your punch time";
             }
 

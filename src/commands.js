@@ -83,6 +83,26 @@ const report_command = {
   name: 'report',
   description: 'To check checkin status of every member',
   type: 1,  // command type: CHAT_INPUT (slash command)
+  "options": [
+    {
+      "name": "pwd",
+      "description": "Enter pwd to generate report of all members",
+      "type": 3, // string
+      "required": true,
+    },
+    {
+      "name": "report_duration",
+      "description": "Duration of report",
+      "type": 3, // string
+      "required": true,
+      "choices": [
+        { name: "Last 7 days", value: "last_7_days" },
+        { name: "Last 30 days", value: "last_30_days" },
+        { name: "Last month", value: "last_month" },
+        { name: "Last 2 month", value: "last_2_months" },
+      ]
+    }
+  ]
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

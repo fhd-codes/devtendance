@@ -13,6 +13,7 @@ const { handleBrb } = require('./src/command_controllers/brb.js');
 const { handleBack } = require('./src/command_controllers/back.js');
 const { handleProgressSubmission } = require('./src/modal_controllers/progress_report_modal.js');
 const { botIsWorking } = require('./src/aux/bot_helper.js');
+const { generateReport } = require('./src/command_controllers/report.js');
 
 dotenv.config();
 const app = express();
@@ -64,6 +65,13 @@ app.post('/interactions', async ( req, res ) => { // Interactions endpoint URL w
             return botIsWorking( res );
 
         }
+        // - - - - - - - - - - - - - - - - -
+        else if( name === 'report'){
+            generateReport( req, res );
+            return botIsWorking( res );
+
+        }
+
 
     } 
     
@@ -72,7 +80,8 @@ app.post('/interactions', async ( req, res ) => { // Interactions endpoint URL w
         const { custom_id } = data;
 
         if( custom_id === 'progress_report_modal' ){
-            return await handleProgressSubmission(req, res);
+            handleProgressSubmission(req, res);
+            return botIsWorking( res );
 
         }
     }

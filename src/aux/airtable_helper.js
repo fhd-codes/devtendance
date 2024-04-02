@@ -1,6 +1,7 @@
 const UIDGenerator = require('uid-generator');
 
 const { airtable_base } = require('./airtable_connection');
+const { getActiveHours } = require('./general_helper');
 
 const uidgen = new UIDGenerator();
 
@@ -46,16 +47,12 @@ const createNewMember = async ( discord_user_id, discord_username, discord_full_
 }
 
 
-const punchTime = async ( airtable_record_id, discord_user_id, punch_type, wfh=false, notes=null ) => {
+const punchTime = async ( airtable_record_id, discord_user_id, discord_full_name, punch_type, wfh=false, notes=null ) => {
     /**
         @params = { string, string, string, bool=false, string=null } - punch_type will be one of these: 
         ["in", "out", "brb", "back"]. Notes will be any string
         @returns = { null }
     */
-
-    // NOTE: making thisw function async is causing error
-    // the airtable gets updated, but the bot reply did not come in response to discord
-    // that's why the async await is not added here
 
     let user_status = null;
 
@@ -89,6 +86,7 @@ const punchTime = async ( airtable_record_id, discord_user_id, punch_type, wfh=f
                 "fields": {
                     "uid": uidgen.generateSync(), // this is uid for checkin checkout
                     "discord_user_id": discord_user_id,
+                    "discord_full_name": discord_full_name,
                     "type": attendance_type,
                     "progress_report": punch_type === "out" ? notes : ""
                 }
@@ -106,8 +104,86 @@ const punchTime = async ( airtable_record_id, discord_user_id, punch_type, wfh=f
 
 }
 
+const getReportData = async ( report_duration ) => {
+    /**
+        @params = { string } - the value can be one of the following: ["last_7_days", "last_30_days", "last_month", "last_2_months"]
+        @returns = { array } - an array of objects where each object contains the member's name and its active hours
+    */
+
+
+    // TODO: make the formula for the last month and last 2 months
+    const formula_lookup = {
+        last_7_days: `
+        IS_AFTER( 
+            DATESTR( CREATED_TIME() ),
+            DATESTR( DATEADD( TODAY(), -7, 'days' ))
+        )`,
+        last_30_days: `
+        IS_AFTER( 
+            DATESTR( CREATED_TIME() ),
+            DATESTR( DATEADD( TODAY(), -30, 'days' ))
+        )`,
+        last_month: ``,
+        last_2_months: ``,
+    }
+    let records_list = [];
+
+    try{
+        await airtable_base('attendance_ledger').select({
+            filterByFormula: formula_lookup[report_duration],
+
+        }).eachPage( function page(records, fetchNextPage)  {
+            records_list.push( ...records  );
+            fetchNextPage();
+
+        });
+
+        /**
+        grouping the records based on discord_user_id. The result will be like this:
+            const records_list_grouped = {
+                '720900787206881290': {
+                    full_name: 'Snippy Microbe',
+                    records: [ {Record}, {Record}, {Record}, {Record} ]
+                },
+                '1180048229396656239': {
+                    full_name: 'Muhammad Ali',
+                    records: [ {Record}, {Record}, {Record}, {Record} ]
+                },
+                ...
+            };
+
+            NOTE: this Record will only have the "Record.fields" object in it
+        */
+        const records_fields_grouped = records_list.reduce((acc, obj) => {
+            acc[obj.fields.discord_user_id] = acc[obj.fields.discord_user_id] || {full_name: obj.fields.discord_full_name, record_fields: []};
+            acc[obj.fields.discord_user_id].record_fields.push(obj.fields);
+            return acc;
+        }, {});
+        
+        let report_data = [];
+        Object.entries(records_fields_grouped).forEach( ([key, user_rec]) => {
+            // sorting the records wrt time field (in ascending order)
+            const time_sorted_recs = user_rec.record_fields.sort((a, b) => {
+                return new Date(a.time) - new Date(b.time);
+            });
+
+            const active_hrs = getActiveHours( time_sorted_recs );
+            report_data.push( {name: user_rec.full_name, active_hrs: active_hrs} )
+        });
+
+        return report_data;
+    
+
+    } catch( error ){
+        console.error("Error handling updating ledger:", error);
+        return res.status(500).send("Error generating report. Please try again later.");
+    }
+}
+
+
 module.exports = {
     isMemberExist,
     createNewMember,
-    punchTime
+    punchTime,
+    getReportData
 }
