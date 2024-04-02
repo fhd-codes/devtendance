@@ -2,13 +2,14 @@ const {
     isMemberExist,
     punchTime,
 } = require('../aux/airtable_helper.js');
-const { botSuccessReply } = require('../aux/bot_helper.js');
+const { botSuccessReply, sendUpdateInChannel } = require('../aux/bot_helper.js');
 
 
 const handleBack = async (req, res) => {
     const { user, data, token } = req.body;
 
     let bot_reply = `Did you bring your creativity?!`;
+    const wfh = data.options[0].value; // There is a chance that the wfh status is changed when the user comes back after a break
 
     try{
         const member_exists = await isMemberExist( user.id );
@@ -21,8 +22,6 @@ const handleBack = async (req, res) => {
             if( current_status === "back" || current_status === "offline" || current_status === "available" || current_status === "available_wfh"){
                 bot_reply = `Your current status is already ${current_status}`;
             } else{
-                // There is a chance that the wfh status is changed when the user comes back after a break
-                const wfh = data.options[0].value;
                 
                 // punching in brb and updating availability status for existing user
                 const ledger_rec = await punchTime( 
@@ -37,6 +36,7 @@ const handleBack = async (req, res) => {
                 bot_reply = ledger_rec.length > 0 ? bot_reply : "Um.. can you try again, I could not update your punch time";
             }
 
+            await sendUpdateInChannel( `${user.global_name} is back online and available ${wfh ? "from home": "in office"}.` );
             botSuccessReply( token, bot_reply );
             
         }

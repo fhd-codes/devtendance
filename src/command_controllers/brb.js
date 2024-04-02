@@ -3,13 +3,14 @@ const {
     punchTime,
 } = require('../aux/airtable_helper.js');
 const { addHoursToCurrentTime } = require('../aux/general_helper.js');
-const { botSuccessReply } = require('../aux/bot_helper.js');
+const { botSuccessReply, sendUpdateInChannel } = require('../aux/bot_helper.js');
 
 
 const handleBrb = async (req, res) => {
     const { user, data, token } = req.body;
 
     let bot_reply = `Explore the world and gather creativity!`;
+    const brb_hrs = data.options[0].value;
 
     try{
         const member_exists = await isMemberExist( user.id );
@@ -29,11 +30,12 @@ const handleBrb = async (req, res) => {
                     user.global_name, // disocrd_full_name
                     "brb", // punch_type
                     false, // wfh
-                    `I'll be back at around ${addHoursToCurrentTime(data.options[0].value)}` // notes
+                    `I'll be back at around ${addHoursToCurrentTime(brb_hrs)}` // notes
                 );
                 bot_reply = ledger_rec.length > 0 ? bot_reply : "Um.. can you try again, I could not update your punch time";
             }
-
+            
+            await sendUpdateInChannel( `${user.global_name} will be back within ${brb_hrs} ${brb_hrs > 1 ? "hrs" : "hour"}.` );
             botSuccessReply( token, bot_reply );
 
         }

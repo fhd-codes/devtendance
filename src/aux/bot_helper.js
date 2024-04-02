@@ -36,9 +36,23 @@ const botSuccessReply = async ( interaction_token, message ) => {
     await DiscordRequest( endpoint, { method: 'PATCH', body: {content: message} } );
 }
 
+const sendUpdateInChannel = async ( update_message ) => {
+    /**
+        This function will send a message in the daily updates channel. Add the channel id in the .env file
+        It uses POST request with '/channels/<channel_id>/messages' endpoint
+        
+        @params = { string } - message that will be sent in the discord daily updates channel
+        @returns = { null }
+    */
+
+    const endpoint = `/channels/${process.env.BOT_DAILY_UPDATE_CHANNEL_ID}/messages`;
+    await DiscordRequest( endpoint, { method: 'POST', body: {content: update_message} } );
+
+}
 
 module.exports = {
     botIsWorking,
     botSuccessReply,
+    sendUpdateInChannel
 
 }

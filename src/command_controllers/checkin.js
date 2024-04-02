@@ -4,7 +4,7 @@ const {
     punchTime,
 } = require('../aux/airtable_helper.js');
 
-const { botSuccessReply } = require('../aux/bot_helper.js');
+const { botSuccessReply, sendUpdateInChannel } = require('../aux/bot_helper.js');
 
 
 const handleCheckin = async (req, res) => {
@@ -41,6 +41,7 @@ const handleCheckin = async (req, res) => {
             }
         }
 
+        await sendUpdateInChannel( `${user.global_name} signed in from ${wfh ? "home": "office"}` );
         botSuccessReply( token, bot_reply );
 
     } catch( error ){
