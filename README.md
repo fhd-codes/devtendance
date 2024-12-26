@@ -17,7 +17,7 @@ Devtendance is a Discord bot designed to track user check-in and check-out times
 ## Installation
 
 1. Clone the repository:
-   ```bash
+   ```
    git clone https://github.com/fhd-codes/devtendance.git
    cd devtendance
    npm install
@@ -42,15 +42,15 @@ Devtendance is a Discord bot designed to track user check-in and check-out times
 3. Usage
   
    Register commands with Discord:
-    ```bash
+    ```
     npm run register
     ```
   Start the bot:
-    ```bash
+    ```
     npm start
     ```
   For development mode with automatic restarts:
-    ```bash
+    ```
     npm run dev
     ```
 
